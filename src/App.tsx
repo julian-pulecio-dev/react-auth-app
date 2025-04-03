@@ -1,18 +1,20 @@
-import { Link } from 'react-router-dom';
-import { useAuth } from './components/AuthProvider';
+import { Outlet } from "react-router";
+import Navbar from "./Components/Navbar/Navbar";
+import "react-toastify/dist/ReactToastify.css";
+import "./App.css";
+import { ToastContainer } from "react-toastify";
+import { UserProvider } from "./Context/useAuth";
 
-export default function App() {
-  const { authToken, handleLogin, handleLogout } = useAuth();
-
+function App() {
   return (
-    <div className="flex flex-col">
-      <h1 className="text-2xl font-bold">Cosden Solutions</h1>
-      <Link to="/protected">Protected Route</Link>
-      {authToken ? (
-        <button onClick={handleLogout}>Logout</button>
-      ) : (
-        <button onClick={handleLogin}>Login</button>
-      )}
-    </div>
+    <>
+      <UserProvider>
+        <Navbar />
+        <Outlet />
+        <ToastContainer />
+      </UserProvider>
+    </>
   );
 }
+
+export default App;
