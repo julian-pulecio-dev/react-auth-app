@@ -1,18 +1,30 @@
 import { createContext, useEffect, useState } from "react";
 import { UserProfile } from "../Models/User";
 import { useNavigate } from "react-router-dom";
-import { loginAPI, registerAPI } from "../Services/AuthService";
+import { loginAPI, registerAPI, confirmUserAPI, loginSRPAPI } from "../Services/AuthService";
 import { toast } from "react-toastify";
 import React from "react";
 import axios from "axios";
 
+import { 
+  CognitoUserPool,
+  CognitoUser,
+  AuthenticationDetails,
+  CognitoUserSession,
+  CognitoAccessToken,
+  CognitoIdToken,
+  CognitoRefreshToken
+} from 'amazon-cognito-identity-js';
+
+
 type UserContextType = {
   user: UserProfile | null;
   token: string | null;
-  registerUser: (email: string, username: string, password: string) => void;
+  registerUser: (username: string, password: string) => void;
   loginUser: (username: string, password: string) => void;
   logout: () => void;
   isLoggedIn: () => boolean;
+  confirmUser: (username: string, confirmation_code: string) => void;
 };
 
 type Props = { children: React.ReactNode };
@@ -43,6 +55,18 @@ export const UserProvider = ({ children }: Props) => {
     await registerAPI(username, password)
       .then((res) => {
         if (res) {
+          toast.success("register Success!");
+          navigate("/confirm-user");
+        }
+      })
+      .catch((e) => toast.warning("Server error occured"));
+  };
+
+  const loginUser = async (username: string, password: string) => {
+    console.log('loginUser')
+    await loginSRPAPI(username, password)
+      .then((res) => {
+        if (res) {
           localStorage.setItem("token", res?.token);
           const userObj = {
             userName: res?.userName,
@@ -58,8 +82,8 @@ export const UserProvider = ({ children }: Props) => {
       .catch((e) => toast.warning("Server error occured"));
   };
 
-  const loginUser = async (username: string, password: string) => {
-    await loginAPI(username, password)
+  const confirmUser = async (username: string, confirmation_code: string) => {
+    await confirmUserAPI(username, confirmation_code)
       .then((res) => {
         if (res) {
           localStorage.setItem("token", res?.token);
@@ -82,16 +106,68 @@ export const UserProvider = ({ children }: Props) => {
   };
 
   const logout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    setUser(null);
-    setToken("");
-    navigate("/");
-  };
+    try {
+      const userPool = new CognitoUserPool({
+        UserPoolId: 'us-east-1_3Tae1o0SV',
+        ClientId: '786q0ubcs8367sqj0igip4002q'
+      });
+      const cognitoUser = userPool.getCurrentUser();
+      
+      if (cognitoUser) {
+        // Async signout (some implementations may need await)
+        cognitoUser.signOut();
+        
+        // Clear storage
+        const clientId = userPool.getClientId();
+        const prefix = `CognitoIdentityServiceProvider.${clientId}`;
+        const keysToRemove = [];
+        
+        // Build list of all Cognito keys
+        keysToRemove.push(`${prefix}.LastAuthUser`);
+        
+        const lastUser = localStorage.getItem(`${prefix}.LastAuthUser`);
+        if (lastUser) {
+          keysToRemove.push(
+            `${prefix}.${lastUser}.idToken`,
+            `${prefix}.${lastUser}.accessToken`,
+            `${prefix}.${lastUser}.refreshToken`,
+            `${prefix}.${lastUser}.userData`
+          );
+        }
+        
+        // Remove all items
+        keysToRemove.forEach(key => {
+          try {
+            localStorage.removeItem(key);
+          } catch (e) {
+            console.warn(`Failed to remove ${key}`, e);
+          }
+        });
+      }
+      
+      // Clear application-specific storage
+      const appKeys = Object.keys(localStorage).filter(key => 
+        key.startsWith('yourApp.')
+      );
+      appKeys.forEach(key => localStorage.removeItem(key));
+      
+      // Force client-side cleanup
+      window.dispatchEvent(new Event('storage'));
+      
+    } catch (error) {
+      console.error('Logout failed:', error);
+      // Fallback: Nuclear option if something went wrong
+      localStorage.clear();
+      sessionStorage.clear();
+    } finally {
+      // Ensure UI updates even if errors occurred
+      window.location.href = '/login';
+    }
+}
 
   return (
     <UserContext.Provider
-      value={{ loginUser, user, token, logout, isLoggedIn, registerUser }}
+      value={{ loginUser, user, token, logout, isLoggedIn, registerUser, confirmUser }}
     >
       {isReady ? children : null}
     </UserContext.Provider>

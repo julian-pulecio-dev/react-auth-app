@@ -12,6 +12,7 @@ import CashflowStatement from "../Components/CashflowStatement/CashflowStatement
 import LoginPage from "../Pages/LoginPage/LoginPage";
 import RegisterPage from "../Pages/RegisterPage/RegisterPage";
 import ProtectedRoute from "./ProtectedRoute";
+import ConfirmUserPage from "../Pages/ConfirmUserPage/ConfirmUserPage"
 
 export const router = createBrowserRouter([
   {
@@ -21,6 +22,7 @@ export const router = createBrowserRouter([
       { path: "", element: <HomePage /> },
       { path: "login", element: <LoginPage /> },
       { path: "register", element: <RegisterPage /> },
+      { path: "confirm-user", element: <ConfirmUserPage /> },
       {
         path: "search",
         element: (
