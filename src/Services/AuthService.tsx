@@ -1,9 +1,10 @@
 import axios from "axios";
 import { handleError } from "../Helpers/ErrorHandler";
 import { UserProfileToken, CustomJwtPayload } from "../Models/User";
+import { loginWithSocial } from "./CognitoService"
 import { jwtDecode } from "jwt-decode";
 import { login } from "./CognitoService"
-
+import { CognitoSocialProvider } from './CognitoTypes';
 
 const api = "https://5g9gr4b646.execute-api.us-east-1.amazonaws.com/test/";
 
@@ -109,6 +110,25 @@ export const loginSRPAPI = async (username: string, password: string) => {
     handleError(error);
   }
 };
+
+export const socialLoginAPI = async () => {
+  console.log('hola desde social login')
+  const response = await loginWithSocial('Google')
+  console.log(response)
+};
+
+export const confirmSocialLoginCodeAPI = async (code:string, provider:string) => {
+  const response = await axios.post(api + "confirm_social_sign_in_code", {
+    code,
+    provider
+  });
+  const access_token = response.data.accessToken
+  const user = response.data.user
+
+  console.log(access_token)
+  console.log(user)
+};
+
 
 function decodeToken(token:string) {
   try {

@@ -1,7 +1,7 @@
 import { createContext, useEffect, useState } from "react";
 import { UserProfile } from "../Models/User";
 import { useNavigate } from "react-router-dom";
-import { loginAPI, registerAPI, confirmUserAPI, loginSRPAPI } from "../Services/AuthService";
+import { loginAPI, registerAPI, confirmUserAPI, loginSRPAPI, socialLoginAPI, confirmSocialLoginCodeAPI } from "../Services/AuthService";
 import { toast } from "react-toastify";
 import React from "react";
 import axios from "axios";
@@ -24,7 +24,9 @@ type UserContextType = {
   loginUser: (username: string, password: string) => void;
   logout: () => void;
   isLoggedIn: () => boolean;
+  socialLogin: () => void;
   confirmUser: (username: string, confirmation_code: string) => void;
+  confirmSocialLoginCode: (code: string, provider:string) => void;
 };
 
 type Props = { children: React.ReactNode };
@@ -101,6 +103,22 @@ export const UserProvider = ({ children }: Props) => {
       .catch((e) => toast.warning("Server error occured"));
   };
 
+  const socialLogin = async () => {
+    await socialLoginAPI()
+      .then((res) => {
+        
+      })
+      .catch((e) => toast.warning("Server error occured"));
+  };
+
+  const confirmSocialLoginCode = async (code: string, provider:string) => {
+    await confirmSocialLoginCodeAPI(code, provider)
+      .then((res) => {
+        
+      })
+      .catch((e) => toast.warning("Server error occured"));
+  };
+
   const isLoggedIn = () => {
     return !!user;
   };
@@ -167,7 +185,7 @@ export const UserProvider = ({ children }: Props) => {
 
   return (
     <UserContext.Provider
-      value={{ loginUser, user, token, logout, isLoggedIn, registerUser, confirmUser }}
+      value={{ loginUser, user, token, logout, isLoggedIn, registerUser, confirmUser, socialLogin, confirmSocialLoginCode }}
     >
       {isReady ? children : null}
     </UserContext.Provider>

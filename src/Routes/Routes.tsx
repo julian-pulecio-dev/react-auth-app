@@ -13,6 +13,7 @@ import LoginPage from "../Pages/LoginPage/LoginPage";
 import RegisterPage from "../Pages/RegisterPage/RegisterPage";
 import ProtectedRoute from "./ProtectedRoute";
 import ConfirmUserPage from "../Pages/ConfirmUserPage/ConfirmUserPage"
+import ConfirmSocialLoginCodePage from "../Pages/ConfirmSocialLoginCodePage/ConfirmSocialLoginCodePage"
 
 export const router = createBrowserRouter([
   {
@@ -23,6 +24,7 @@ export const router = createBrowserRouter([
       { path: "login", element: <LoginPage /> },
       { path: "register", element: <RegisterPage /> },
       { path: "confirm-user", element: <ConfirmUserPage /> },
+      { path: "social-login-confirm-code", element: <ConfirmSocialLoginCodePage /> },
       {
         path: "search",
         element: (

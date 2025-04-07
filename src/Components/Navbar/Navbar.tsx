@@ -7,7 +7,7 @@ import { useAuth } from "../../Context/useAuth";
 interface Props {}
 
 const Navbar = (props: Props) => {
-  const { isLoggedIn, user, logout } = useAuth();
+  const { isLoggedIn, user, logout, socialLogin } = useAuth();
   return (
     <nav className="relative container mx-auto p-6">
       <div className="flex items-center justify-between">
@@ -42,7 +42,11 @@ const Navbar = (props: Props) => {
             >
               Signup
             </Link>
+            <div>
+              <button onClick={() => socialLogin()}>Login with Google</button>
+            </div>
           </div>
+          
         )}
       </div>
     </nav>

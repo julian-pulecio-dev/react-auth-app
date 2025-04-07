@@ -8,6 +8,10 @@ import {
   CognitoRefreshToken
 } from 'amazon-cognito-identity-js';
 
+
+import { cognitoConfig } from '../cognitoConfig';
+import { CognitoSocialProvider } from './CognitoTypes';
+
 // Configuration
 const poolData = {
   UserPoolId: 'us-east-1_3Tae1o0SV', // Replace with your user pool ID
@@ -110,3 +114,13 @@ export async function getCurrentSession(): Promise<CognitoUserSession | null> {
     });
   });
 }
+
+export async function loginWithSocial(provider: CognitoSocialProvider) {
+  const { Domain, ClientId, RedirectSignIn, ResponseType, Scope } = cognitoConfig;
+  const scope = Scope.join('+');
+  
+  const url = `https://${Domain}/oauth2/authorize?identity_provider=${provider}&response_type=${ResponseType}&client_id=${ClientId}&redirect_uri=${RedirectSignIn}&scope=${scope}`;
+  
+  window.location.href = url;
+};
+
