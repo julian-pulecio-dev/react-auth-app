@@ -95,3 +95,11 @@ export interface AmplifyConfig {
     };
   };
 }
+
+declare module '@react-oauth/google' {
+  interface CredentialResponse {
+    code?: string;  // Add the code property
+    credential?: string;
+    clientId?: string;
+  }
+}

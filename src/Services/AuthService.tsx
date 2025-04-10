@@ -6,7 +6,7 @@ import { jwtDecode } from "jwt-decode";
 import { login } from "./CognitoService"
 import { CognitoSocialProvider } from './CognitoTypes';
 
-const api = "https://5g9gr4b646.execute-api.us-east-1.amazonaws.com/test/";
+const api = "https://crj76kuo3b.execute-api.us-east-1.amazonaws.com/test/";
 
 export const loginAPI = async (username: string, password: string) => {
   console.log('loginAPI')

@@ -3,11 +3,24 @@ import { Link } from "react-router-dom";
 import logo from "./logo.png";
 import "./Navbar.css";
 import { useAuth } from "../../Context/useAuth";
+import { useGoogleLogin } from '@react-oauth/google';
+import { GoogleOAuthProvider, GoogleLogin, CredentialResponse } from '@react-oauth/google';
 
 interface Props {}
 
 const Navbar = (props: Props) => {
-  const { isLoggedIn, user, logout, socialLogin } = useAuth();
+  const { isLoggedIn, user, logout, confirmSocialLoginCode  } = useAuth();
+
+  const login = useGoogleLogin({
+    flow: 'auth-code',
+    onSuccess: (codeResponse) => {
+      console.log("Authorization code:", codeResponse.code);
+      confirmSocialLoginCode(codeResponse.code, 'Google');
+    },
+    onError: (error) => console.error('Login Failed:', error),
+  });
+
+
   return (
     <nav className="relative container mx-auto p-6">
       <div className="flex items-center justify-between">
@@ -43,7 +56,9 @@ const Navbar = (props: Props) => {
               Signup
             </Link>
             <div>
-              <button onClick={() => socialLogin()}>Login with Google</button>
+              <button onClick={() => login()}>
+                Sign in with Google
+              </button>
             </div>
           </div>
           
