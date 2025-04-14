@@ -1,23 +1,35 @@
 import React, { useState } from 'react';
 import { loginSRP } from '../Services/Auth/LoginSRP';
+import { useEffect } from "react";
+import { useAuth } from "../Context/useAuth";
+import GoogleSignInButton from "../Components/GoogleSignInButton/GoogleSignInButton";
 
 const Login: React.FC = () => {
+  const { loginUser, error: authError } = useAuth();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    return () => {
+      setError(null); // Clean up error when component unmounts
+    };
+  }, [setError]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
     try {
-      const tokens = await loginSRP(username, password);
+      console.log('handleLogin')
+      await loginUser(username, password);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed');
     }
   };
 
   return (
+    <>
     <form onSubmit={handleLogin}>
       <div>
         <label>Username:</label>
@@ -40,6 +52,8 @@ const Login: React.FC = () => {
       {error && <p style={{ color: 'red' }}>{error}</p>}
       <button type="submit">Login</button>
     </form>
+    <GoogleSignInButton />
+    </>
   );
 };
 
