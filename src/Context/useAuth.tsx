@@ -2,8 +2,7 @@ import { createContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { loginSRP } from "../Services/Auth/LoginSRP";
 import { logout } from "../Services/Auth/Logout";
-import { loginSocial } from "../Services/Auth/LoginSocial";
-import { confirmSocialLogin } from "../Services/Auth/ConfirmSocialLogin";
+import { callbackSocialLogin } from "../Services/Auth/CallbackSocialLogin";
 import { UserProfile,  } from "../Types/User";
 import { decodeToken } from "../Helpers/DecodeJWt";
 import React from "react";
@@ -15,8 +14,7 @@ type UserContextType = {
   token: string | null;
   error: string | null;
   loginUser: (username: string, password: string) => void;
-  loginSocialUser: (provider: string) => void;
-  confirmSocialLoginUser: (code: string, provider:string) => void
+  callbackSocialLoginUser: (code: string, provider:string) => void
   logoutUser: () => void;
   isLoggedIn: () => boolean;
   setError: (error: string | null) => void;
@@ -61,12 +59,22 @@ export const UserProvider = ({ children }: Props) => {
       })  
   };
 
-  const loginSocialUser = async (provider:string) => {
-    await loginSocial(provider)
-  };
-
-  const confirmSocialLoginUser = async (code: string, provider:string) => {
-    await confirmSocialLogin(code, provider)
+  const callbackSocialLoginUser = async (code: string, provider:string) => {
+    await callbackSocialLogin(code, provider)
+      .then((res) => {
+        const decodedToken = decodeToken(res?.idToken!);
+        if (!decodedToken?.email) {
+          throw new Error("Decoded token does not contain a valid email.");
+        }
+        const userObj = {
+          userName: decodedToken.email,
+          email: decodedToken.email,
+        };
+        localStorage.setItem("user", JSON.stringify(userObj));
+        localStorage.setItem("token", res?.accessToken);
+        setToken(res?.accessToken!);
+        setUser(userObj!);
+      })
 
   };
 
@@ -81,7 +89,7 @@ export const UserProvider = ({ children }: Props) => {
 
   return (
     <UserContext.Provider
-      value={{ loginUser, loginSocialUser, confirmSocialLoginUser, user, token, logoutUser, isLoggedIn, error, setError,}}
+      value={{ loginUser, callbackSocialLoginUser, user, token, logoutUser, isLoggedIn, error, setError,}}
     >
       {isReady ? children : null}
     </UserContext.Provider>

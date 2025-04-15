@@ -2,7 +2,7 @@ import React from "react";
 import { createBrowserRouter } from "react-router-dom";
 import App from "../App";
 import LoginPage from "../Pages/Login";
-import ConfirmSocialLoginCodePage from "../Pages/ConfirmSocialLoginCodePage";
+import CallbackSocialLoginPage from "../Pages/CallbackSocialLoginPage";
 
 export const router = createBrowserRouter([
   {
@@ -10,7 +10,7 @@ export const router = createBrowserRouter([
     element: <App />,
     children: [
       { path: "login", element: <LoginPage /> },
-      { path: "social-login-confirm-code", element: <ConfirmSocialLoginCodePage /> },
+      { path: "social-login-confirm-code", element: <CallbackSocialLoginPage /> },
     ],
   },
 ]);

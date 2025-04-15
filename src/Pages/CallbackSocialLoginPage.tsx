@@ -5,8 +5,8 @@ import { useAuth } from "../Context/useAuth";
 
 import React from 'react';
 
-const ConfirmSocialLoginCodePage = () => {
-  const { confirmSocialLoginUser } = useAuth();
+const callbackSocialLoginPage = () => {
+  const { callbackSocialLoginUser } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -23,7 +23,7 @@ const ConfirmSocialLoginCodePage = () => {
         if (!code) {
           throw new Error('Authorization code not found');
         }
-        confirmSocialLoginUser(code, 'Google')
+        callbackSocialLoginUser(code, 'Google')
         navigate('/');
       } catch (err) {
         console.error('Authentication failed:', err);
@@ -43,4 +43,4 @@ const ConfirmSocialLoginCodePage = () => {
   );
 };
 
-export default ConfirmSocialLoginCodePage;
+export default callbackSocialLoginPage;

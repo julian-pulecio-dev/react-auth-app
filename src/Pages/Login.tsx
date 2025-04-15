@@ -12,8 +12,8 @@ const Login: React.FC = () => {
 
   useEffect(() => {
     return () => {
-      setError(null); // Clean up error when component unmounts
-    };
+      setError(null); 
+  };
   }, [setError]);
 
   const handleLogin = async (e: React.FormEvent) => {
